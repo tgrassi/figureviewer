@@ -1,13 +1,12 @@
-# PDF Image Extractor and Viewer
+# FigureViewer
 
-A Python utility that extracts images from PDF files and provides an interactive PyQt5-based GUI for viewing them.
+Tired of jumping around on a paper when authors cite figures two millions pages away?
+Here is a Python utility that extracts images from PDF files and provides an interactive PyQt5-based GUI for viewing them.
 
 ## Features
 
 - Extract all images from PDF files automatically
 - Navigate through images using mouse scroll or keyboard arrows
-- Buffered mode for reusing previously extracted images
-- Zero-padded image naming for proper sorting
 
 ## Requirements
 
@@ -16,18 +15,14 @@ A Python utility that extracts images from PDF files and provides an interactive
 - PyQt5
 - tqdm
 
-## Installation
+## Installation and usage
 
 ```bash
+git clone git@github.com:tgrassi/figureviewer.git
 pip install pypdf PyQt5 tqdm
-```
-
-## Usage
-
-### Extract and view images from a PDF:
-```bash
 python imgs.py path/to/your/file.pdf
 ```
+Use mouse wheel to scroll or keyboard arrows.
 
 ### Use pre-extracted images (buffered mode):
 ```bash
