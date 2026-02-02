@@ -1,6 +1,6 @@
 # FigureViewer
 
-Tired of jumping around on a paper when authors cite figures two millions pages away?
+Tired of jumping around on a paper when authors cite figures two millions pages away?       
 Here is a Python utility that extracts images from PDF files and provides an interactive PyQt5-based GUI for viewing them.
 
 ## Features
