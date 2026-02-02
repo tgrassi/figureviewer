@@ -8,7 +8,7 @@ from pypdf import PdfReader
 from tqdm import tqdm
 import os
 from glob import glob
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QScrollArea
+from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QScrollArea, QSizePolicy
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 import sys
@@ -105,7 +105,17 @@ class ImageViewer(QMainWindow):
         self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
+        self.scroll.setFocusPolicy(Qt.NoFocus)
+        self.setFocusPolicy(Qt.StrongFocus)
+        self.setFocus()
+
+        self.scroll.setMinimumSize(0, 0)
+        self.scroll.setSizePolicy(QSizePolicy.Ignored, QSizePolicy.Ignored)
+        self.setMinimumSize(20, 20)
+
         self.alwaysOnTop = False
+        self.last_height = None
+        self.is_hidden = False
 
         self.update_image()
 
@@ -141,6 +151,7 @@ class ImageViewer(QMainWindow):
         Args:
             event (QKeyEvent): The key press event object.
         """
+
         if event.key() in (Qt.Key_Right, Qt.Key_Down, Qt.Key_Space, Qt.Key_PageDown):
             self.current_index = (self.current_index + 1) % len(self.image_files)
             self.update_image()
@@ -153,6 +164,16 @@ class ImageViewer(QMainWindow):
             self.alwaysOnTop = not self.alwaysOnTop
             self.setWindowFlag(Qt.WindowStaysOnTopHint, self.alwaysOnTop)
             self.show()
+        elif event.key() == Qt.Key_X:
+            # store current height
+            if self.is_hidden:
+                self.resize(self.width(), self.last_height)
+                self.is_hidden = False
+            else:
+                self.last_height = self.height()
+                # set scroll area height to zero to hide it
+                self.resize(self.width(), self.minimumSizeHint().height())
+                self.is_hidden = True
         elif event.key() == Qt.Key_Home:
             self.current_index = 0
             self.update_image()
@@ -171,6 +192,7 @@ class ImageViewer(QMainWindow):
                 "- Space/PageUp/PageDown: navigate images.\n"
                 "- R: refresh the current image.\n"
                 "- T/A: toggle always-on-top mode.\n"
+                "- X: toggle hiding/showing the window content.\n"
                 "- Home: go to the first image.\n"
                 "- End: go to the last image.\n"
                 "- Esc/Q: quit the viewer.\n"
