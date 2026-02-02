@@ -1,6 +1,6 @@
 # FigureViewer
 
-Tired of jumping around on a paper when authors cite figures two millions pages away?       
+Tired of jumping around on a paper when authors cite figures two millions pages away?
 Here is a Python utility that extracts images from PDF files and provides an interactive PyQt5-based GUI for viewing them.
 
 ## Features
@@ -23,6 +23,18 @@ pip install pypdf PyQt5 tqdm
 python viwer.py path/to/your/file.pdf
 ```
 Use mouse wheel to scroll or keyboard arrows.
+
+## Keys
+- **Mouse Wheel**: Scroll up/down to move between images
+- **Arrow Keys**: Use Up/Down/Left/Right to navigate
+- **PageUp/PageDown**: Navigate images
+- **Space**: Next image
+- **R**: Refresh the current image
+- **T/A**: Toggle always-on-top mode
+- **Home**: Go to the first image
+- **End**: Go to the last image
+- **Esc/Q**: Quit the application
+- **H**: Show help dialog
 
 ### Use pre-extracted images (buffered mode):
 ```bash
