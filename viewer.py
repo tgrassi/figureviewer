@@ -162,8 +162,10 @@ class ImageViewer(QMainWindow):
             self.update_image()
         elif event.key() in (Qt.Key_T, Qt.Key_A):
             self.alwaysOnTop = not self.alwaysOnTop
+            geom = self.saveGeometry()
             self.setWindowFlag(Qt.WindowStaysOnTopHint, self.alwaysOnTop)
             self.show()
+            self.restoreGeometry(geom)
         elif event.key() == Qt.Key_X:
             # store current height
             if self.is_hidden:
