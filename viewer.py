@@ -8,7 +8,7 @@ from pypdf import PdfReader
 from tqdm import tqdm
 import os
 from glob import glob
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow
+from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QScrollArea
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 import sys
@@ -97,6 +97,16 @@ class ImageViewer(QMainWindow):
         self.label.setAlignment(Qt.AlignCenter)
         self.setCentralWidget(self.label)
 
+        self.scroll = QScrollArea()
+        self.scroll.setWidget(self.label)
+        self.setCentralWidget(self.scroll)
+
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
+        self.alwaysOnTop = False
+
         self.update_image()
 
     def update_image(self):
@@ -104,9 +114,9 @@ class ImageViewer(QMainWindow):
 
         if self.image_files:
             pixmap = QPixmap(self.image_files[self.current_index])
-            self.label.setPixmap(pixmap.scaled(self.label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            self.label.setPixmap(pixmap.scaled(self.scroll.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
             # change window title to current image file name
-            self.setWindowTitle(f"PDF Image Viewer - Fig.{self.current_index + 1}")
+            self.setWindowTitle(f"PDF Image Viewer - Fig.{self.current_index + 1} / {len(self.image_files)}")
 
     def wheelEvent(self, event):
         """Handle mouse wheel events to navigate through images.
@@ -131,14 +141,56 @@ class ImageViewer(QMainWindow):
         Args:
             event (QKeyEvent): The key press event object.
         """
-        if event.key() == Qt.Key_Right or event.key() == Qt.Key_Down:
+        if event.key() in (Qt.Key_Right, Qt.Key_Down, Qt.Key_Space, Qt.Key_PageDown):
             self.current_index = (self.current_index + 1) % len(self.image_files)
             self.update_image()
-        elif event.key() == Qt.Key_Left or event.key() == Qt.Key_Up:
+        elif event.key() in (Qt.Key_Left, Qt.Key_Up, Qt.Key_PageUp):
             self.current_index = (self.current_index - 1) % len(self.image_files)
             self.update_image()
+        elif event.key() == Qt.Key_R:
+            self.update_image()
+        elif event.key() in (Qt.Key_T, Qt.Key_A):
+            self.alwaysOnTop = not self.alwaysOnTop
+            self.setWindowFlag(Qt.WindowStaysOnTopHint, self.alwaysOnTop)
+            self.show()
+        elif event.key() == Qt.Key_Home:
+            self.current_index = 0
+            self.update_image()
+        elif event.key() == Qt.Key_End:
+            self.current_index = len(self.image_files) - 1
+            self.update_image()
+        elif event.key() == Qt.Key_Escape or event.key() == Qt.Key_Q:
+            self.close()
+        elif event.key() == Qt.Key_H:
+            # open help dialog
+            help_text = (
+                "PDF Image Viewer Help:\n\n"
+                "- Mouse wheel: navigate through images.\n"
+                "- Left/Up arrow keys: previous image.\n"
+                "- Right/Down arrow keys: next image.\n"
+                "- Space/PageUp/PageDown: navigate images.\n"
+                "- R: refresh the current image.\n"
+                "- T/A: toggle always-on-top mode.\n"
+                "- Home: go to the first image.\n"
+                "- End: go to the last image.\n"
+                "- Esc/Q: quit the viewer.\n"
+                "- H: show this help dialog."
+            )
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.information(self, "Help", help_text)
+
+    def resizeEvent(self, event):
+        """Handle window resize events to adjust image scaling.
+
+        Args:
+            event (QResizeEvent): The resize event object.
+        """
+        self.update_image()
 
 
+# ============================================================================
+# Main application execution
+# ============================================================================
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     viewer = ImageViewer("images")
