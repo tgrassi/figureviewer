@@ -37,10 +37,22 @@ Use mouse wheel to scroll or keyboard arrows.
 - **Esc/Q**: Quit the application
 - **H**: Show help dialog
 
-### Use pre-extracted images (buffered mode):
+## Use pre-extracted images (buffered mode):
 ```bash
 python viewer.py path/to/your/file.pdf -b
 ```
+
+## Use mapping between image file and figure number:
+Since not all the extracted files are relevant, or there are multiple images per figure, you can map the image file to the figure number.    
+For example, if Figure 1 corresponds to the second file (so you skip the first file), and Figure 3 is formed by three image files, you can create a file `maps.txt`
+```
+-1, 1, 2, 3, 3, 3, 4, 5, 6, 7
+```
+and run
+```bash
+python viewer.py path/to/your/file.pdf path/to/maps.txt
+```
+
 
 ## How It Works
 
