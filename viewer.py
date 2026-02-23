@@ -21,6 +21,9 @@ pypdf.filters.MAX_IMAGE_DECOMPRESS_SIZE = 200 * 1024 * 1024
 pypdf.filters.ZLIB_MAX_OUTPUT_LENGTH = 1000 * 1024 * 1024  # 1 GB
 pypdf.filters.LZW_MAX_OUTPUT_LENGTH = 1000 * 1024 * 1024   # 1 GB
 
+# max image size in pxls
+max_size = 1000
+
 # ============================================================================
 # Command-line argument parsing
 # ============================================================================
@@ -80,6 +83,12 @@ if not use_buffered:
         for i, image_file_object in enumerate(page.images):
             # Save image with zero-padded counter in filename
             filename = f"images/image_{icount:06d}.png"
+            width, height = image_file_object.image.size
+            size = max(width, height)
+            if size > max_size:
+                rsz = [int(max_size * width / size), int(max_size * height / size)]
+                print("Large image, resizing to", rsz)
+                image_file_object.image = image_file_object.image.resize(rsz)
             image_file_object.image.save(filename)
 
             icount += 1
