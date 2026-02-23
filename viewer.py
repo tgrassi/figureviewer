@@ -28,13 +28,24 @@ pypdf.filters.LZW_MAX_OUTPUT_LENGTH = 1000 * 1024 * 1024   # 1 GB
 if len(sys.argv) > 1:
     pdf_path = sys.argv[1]
 else:
-    print(f"Error: missing PDF file\nUsage: python {sys.argv[0]} <path-to-pdf-file>")
+    print(f"Error: missing PDF file\nUsage: python {sys.argv[0]} <path-to-pdf-file> [mapping-file]")
     sys.exit(1)
+
+mapping_path = None
+if len(sys.argv) > 2:
+    mapping_path = sys.argv[2]
 
 # Validate that the PDF file exists
 if not os.path.exists(pdf_path):
     print(f"Error: PDF file '{pdf_path}' does not exist")
     sys.exit(1)
+
+# Validate that the mapping file exists
+if mapping_path is not None:
+    if not os.path.exists(mapping_path):
+        print(f"Error: mapping file '{mapping_path}' does not exist")
+        sys.exit(1)
+
 
 # ============================================================================
 # Configuration and initialization
@@ -72,6 +83,18 @@ if not use_buffered:
             image_file_object.image.save(filename)
 
             icount += 1
+
+# ============================================================================
+# Read image mapping if file present
+# ============================================================================
+mapping = None
+if mapping_path is not None:
+    for ll in open(mapping_path):
+        sl = ll.strip()
+        if sl == "" or sl.startswith("#"):
+            continue
+    mapping = [int(x) for x in sl.split(",")]
+
 
 # ============================================================================
 # PyQt5 Image Viewer
@@ -133,7 +156,15 @@ class ImageViewer(QMainWindow):
             pixmap = QPixmap(self.image_files[self.current_index])
             self.label.setPixmap(pixmap.scaled(self.scroll.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation))
             # change window title to current image file name
-            self.setWindowTitle(f"PDF Image Viewer - Fig.{self.current_index + 1} / {len(self.image_files)}")
+            if mapping is None:
+                self.setWindowTitle(f"PDF Image Viewer - Fig.{self.current_index + 1} / {len(self.image_files)}")
+            else:
+                img_title = mapping[self.current_index]
+                if img_title <= 0:
+                    self.setWindowTitle("Not mapped")
+                else:
+                    max_images = max(mapping)
+                    self.setWindowTitle(f"PDF Image Viewer - Fig.{img_title} / {max_images}")
 
     def wheelEvent(self, event):
         """Handle mouse wheel events to navigate through images.
