@@ -4,6 +4,7 @@ This module extracts images from a PDF file and provides a PyQt5-based GUI
 to view and navigate through the extracted images using mouse scroll or keyboard.
 """
 
+import pypdf.filters
 from pypdf import PdfReader
 from tqdm import tqdm
 import os
@@ -13,6 +14,12 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 import sys
 
+
+# these limits are very high to avoid issues with highly compressed images
+pypdf.filters.MAX_DECOMPRESS_SIZE = 200 * 1024 * 1024
+pypdf.filters.MAX_IMAGE_DECOMPRESS_SIZE = 200 * 1024 * 1024
+pypdf.filters.ZLIB_MAX_OUTPUT_LENGTH = 1000 * 1024 * 1024  # 1 GB
+pypdf.filters.LZW_MAX_OUTPUT_LENGTH = 1000 * 1024 * 1024   # 1 GB
 
 # ============================================================================
 # Command-line argument parsing
